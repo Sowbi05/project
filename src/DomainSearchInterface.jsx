@@ -60,6 +60,9 @@ const DomainSearchApp = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [excludedTerms, setExcludedTerms] = useState([]);
   const [includedTerms, setIncludedTerms] = useState([]);
+  const [refinedQuery, setRefinedQuery] = useState('');
+  const [searchStage, setSearchStage] = useState(1); // 1 = initial, 2 = refined
+  const [enhancedSearchContext, setEnhancedSearchContext] = useState(null);
   const itemsPerPage = 10;
 
   // Contextual search intelligence
@@ -68,31 +71,36 @@ const DomainSearchApp = () => {
       keywords: ['football', 'basketball', 'soccer', 'tennis', 'cricket', 'baseball', 'hockey'],
       domains: ['espn.com', 'sports.com', 'bleacherreport.com', 'si.com'],
       categories: ['Sports', 'Entertainment'],
-      refinements: ['specific sport', 'league', 'season', 'team']
+      refinements: ['specific sport', 'league', 'season', 'team'],
+      excludeTerms: ['gambling', 'betting', 'controversial']
     },
     'finance': {
       keywords: ['investment', 'banking', 'stocks', 'cryptocurrency', 'trading', 'markets', 'economy'],
       domains: ['bloomberg.com', 'wsj.com', 'ft.com', 'marketwatch.com', 'cnbc.com'],
       categories: ['Finance', 'Business', 'News'],
-      refinements: ['investment type', 'market sector', 'financial instrument', 'company size']
+      refinements: ['investment type', 'market sector', 'financial instrument', 'company size'],
+      excludeTerms: ['risky investments', 'penny stocks', 'gambling']
     },
     'technology': {
       keywords: ['software', 'hardware', 'AI', 'machine learning', 'cybersecurity', 'cloud', 'mobile'],
       domains: ['techcrunch.com', 'wired.com', 'arstechnica.com', 'theverge.com'],
       categories: ['Technology', 'Innovation', 'Business'],
-      refinements: ['tech category', 'company type', 'innovation stage', 'platform']
+      refinements: ['tech category', 'company type', 'innovation stage', 'platform'],
+      excludeTerms: ['adult content', 'piracy', 'hacking']
     },
     'news': {
       keywords: ['breaking', 'politics', 'world', 'local', 'international', 'current events'],
       domains: ['cnn.com', 'bbc.com', 'reuters.com', 'nytimes.com', 'washingtonpost.com'],
       categories: ['News', 'Politics', 'World'],
-      refinements: ['news type', 'geography', 'topic focus', 'time sensitivity']
+      refinements: ['news type', 'geography', 'topic focus', 'time sensitivity'],
+      excludeTerms: ['fake news', 'conspiracy', 'unverified']
     },
     'entertainment': {
       keywords: ['movies', 'music', 'celebrities', 'tv shows', 'streaming', 'gaming'],
       domains: ['entertainment.com', 'variety.com', 'hollywood.com', 'ign.com'],
       categories: ['Entertainment', 'Lifestyle', 'Media'],
-      refinements: ['content type', 'genre', 'platform', 'audience age']
+      refinements: ['content type', 'genre', 'platform', 'audience age'],
+      excludeTerms: ['adult content', 'violence', 'inappropriate']
     }
   };
 
@@ -183,7 +191,7 @@ const DomainSearchApp = () => {
   };
 
   // Simulate intelligent search processing
-  const performIntelligentSearch = async (query) => {
+  const performIntelligentSearch = async (query, isRefinement = false) => {
     setIsSearching(true);
 
     // Simulate API delay
@@ -192,16 +200,33 @@ const DomainSearchApp = () => {
     const context = detectSearchContext(query);
     const { includeTerms, excludeTerms } = extractRefinementTerms(query);
 
+    const enhancedContext = context ? {
+    ...context,
+    suggestedExclusions: context.excludeTerms || [],
+    searchStage: isRefinement ? 2 : 1,
+    originalQuery: isRefinement ? searchQuery : query,
+    refinedQuery: isRefinement ? query : null
+  } : null;
+
     setSearchContext(context);
     setIncludedTerms(includeTerms);
     setExcludedTerms(excludeTerms);
+
+    if (isRefinement) {
+    setSearchStage(2);
+    setRefinedQuery(query);
+  } else {
+    setSearchStage(1);
+    setRefinedQuery('');
+  }
 
     // Add to search history
     setSearchHistory(prev => [{
       query,
       timestamp: new Date(),
       context: context?.primaryContext,
-      stage: refinementStage
+      stage: refinementStage ? 2 : 1,
+      isRefinement
     }, ...prev.slice(0, 9)]);
 
     setIsSearching(false);
@@ -231,10 +256,9 @@ const DomainSearchApp = () => {
 
   // Handle refinement search
   const handleRefinementSearch = (refinementTerm) => {
-    const newQuery = `${searchQuery} ${refinementTerm}`;
-    setSearchQuery(newQuery);
-    setRefinementStage(prev => prev + 1);
-    performIntelligentSearch(newQuery);
+    const baseQuery = searchStage === 1 ? searchQuery : refinedQuery;
+    const newQuery = `${baseQuery} ${refinementTerm}`;
+    performIntelligentSearch(newQuery, true);
   };
 
   // Handle suggestion selection
@@ -413,15 +437,21 @@ const DomainSearchApp = () => {
       includeExclude: 'include',
       mediaSubtype: [],
       deviceType: [],
+      distributionChannel: [], // ADD
+      videoPlacement: [], // ADD
+      dateRange: 30, // ADD
       geography: 'Global',
       language: [],
       contentStyle: [],
       safetyTier: [],
+      isDirect: false, // ADD
       publishers: [],
       minViewability: 0,
       minCTR: 0,
       minReach: 0,
       relevance: 0,
+      relevanceThreshold: 0, // ADD
+      minReachThreshold: 1, // ADD
       totalReach: '0',
       minViewabilityThreshold: 0,
       minCTRVTR: 0
@@ -830,14 +860,16 @@ const DomainSearchApp = () => {
 
             {/* Quick Filters Row */}
             <div className="quick-filters">
-              <span className="quick-filter">Format: Display</span>
-              <span className="quick-filter">GEO: Global</span>
-              <span className="quick-filter">Channel: All</span>
-              <span className="quick-filter">Stream: In-stream</span>
-              <span className="quick-filter">Min. Relevance: 75%</span>
-              <span className="quick-filter">Total Reach: 25M+</span>
-              <span className="quick-filter">Min. Viewability: 65%</span>
-              <span className="quick-filter">Min. CTR/VTR: 0.8%</span>
+              <span className="quick-filter">Format: {filters.mediaSubtype.join(', ') || 'All'}</span>
+              <span className="quick-filter">GEO: {filters.geography}</span>
+              <span className="quick-filter">Channel: {filters.distributionChannel.join(', ') || 'All'}</span>
+              <span className="quick-filter">Placement: {filters.videoPlacement.join(', ') || 'All'}</span>
+              <span className="quick-filter">Min. Relevance: {filters.relevanceThreshold}%</span>
+              <span className="quick-filter">Min. Reach: {filters.minReachThreshold}M+</span>
+              <span className="quick-filter">Min. Viewability: {filters.minViewabilityThreshold}%</span>
+              <span className="quick-filter">Min. CTR/VTR: {filters.minCTRVTR}%</span>
+              <span className="quick-filter">Period: {filters.dateRange} days</span>
+              {filters.isDirect && <span className="quick-filter">Direct Only</span>}
             </div>
           </div>
 
