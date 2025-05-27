@@ -61,7 +61,7 @@ const DomainSearchApp = () => {
   const [excludedTerms, setExcludedTerms] = useState([]);
   const [includedTerms, setIncludedTerms] = useState([]);
   const itemsPerPage = 10;
-  
+
   // Contextual search intelligence
   const searchContexts = {
     'sports': {
@@ -100,7 +100,7 @@ const DomainSearchApp = () => {
   const generateSearchSuggestions = (input) => {
     const suggestions = [];
     const lowerInput = input.toLowerCase();
-    
+
     // Context-aware suggestions
     Object.keys(searchContexts).forEach(context => {
       if (lowerInput.includes(context) || searchContexts[context].keywords.some(k => lowerInput.includes(k))) {
@@ -131,10 +131,10 @@ const DomainSearchApp = () => {
   // Detect search context from query
   const detectSearchContext = (query) => {
     const lowerQuery = query.toLowerCase();
-    
+
     for (const [context, data] of Object.entries(searchContexts)) {
-      if (lowerQuery.includes(context) || 
-          data.keywords.some(keyword => lowerQuery.includes(keyword))) {
+      if (lowerQuery.includes(context) ||
+        data.keywords.some(keyword => lowerQuery.includes(keyword))) {
         return {
           primaryContext: context,
           detectedKeywords: data.keywords.filter(k => lowerQuery.includes(k)),
@@ -144,7 +144,7 @@ const DomainSearchApp = () => {
         };
       }
     }
-    
+
     return null;
   };
 
@@ -152,7 +152,7 @@ const DomainSearchApp = () => {
   const extractRefinementTerms = (query) => {
     const includeTerms = [];
     const excludeTerms = [];
-    
+
     // Look for exclude patterns
     const excludePatterns = ['not', 'except', 'without', 'exclude', 'minus'];
     excludePatterns.forEach(pattern => {
@@ -185,17 +185,17 @@ const DomainSearchApp = () => {
   // Simulate intelligent search processing
   const performIntelligentSearch = async (query) => {
     setIsSearching(true);
-    
+
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     const context = detectSearchContext(query);
     const { includeTerms, excludeTerms } = extractRefinementTerms(query);
-    
+
     setSearchContext(context);
     setIncludedTerms(includeTerms);
     setExcludedTerms(excludeTerms);
-    
+
     // Add to search history
     setSearchHistory(prev => [{
       query,
@@ -203,7 +203,7 @@ const DomainSearchApp = () => {
       context: context?.primaryContext,
       stage: refinementStage
     }, ...prev.slice(0, 9)]);
-    
+
     setIsSearching(false);
   };
 
@@ -211,7 +211,7 @@ const DomainSearchApp = () => {
   const handleSearchInputChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
-    
+
     if (value.length > 2) {
       const suggestions = generateSearchSuggestions(value);
       setSearchSuggestions(suggestions);
@@ -256,15 +256,21 @@ const DomainSearchApp = () => {
     includeExclude: 'include',
     mediaSubtype: ['Video'],
     deviceType: ['phone', 'tablet', 'desktop'],
+    distributionChannel: ['Programmatic', 'Direct'],
+    videoPlacement: ['instream'],
+    dateRange: 30,
     geography: 'Global',
     language: ['English'],
     contentStyle: ['Factual', 'Editorial'],
     safetyTier: ['Universal'],
+    isDirect: false,
     publishers: ['Financial Times Ltd.', 'Dow Jones & Co.', 'Bloomberg L.P.'],
     minViewability: 70,
     minCTR: 1.5,
     minReach: 10,
     relevance: 75,
+    relevanceThreshold: 75,
+    minReachThreshold: 1,
     totalReach: '25M+',
     minViewabilityThreshold: 65,
     minCTRVTR: 0.8
@@ -273,15 +279,15 @@ const DomainSearchApp = () => {
   // Generate sample data with more entries
   const generateDomainResults = (count) => {
     const domains = [
-      'nytimes.com', 'wsj.com', 'cnn.com', 'bbc.com', 'reuters.com', 
+      'nytimes.com', 'wsj.com', 'cnn.com', 'bbc.com', 'reuters.com',
       'bloomberg.com', 'ft.com', 'economist.com', 'guardian.com', 'washingtonpost.com',
       'forbes.com', 'businessinsider.com', 'cnbc.com', 'marketwatch.com', 'yahoo.com'
     ];
     const categories = [
-      ['News', 'Business'], ['Business', 'Finance'], ['News', 'Politics'], 
+      ['News', 'Business'], ['Business', 'Finance'], ['News', 'Politics'],
       ['News', 'World'], ['Business', 'Technology'], ['Finance', 'Markets']
     ];
-    
+
     return Array.from({ length: count }, (_, i) => ({
       id: i + 1,
       domain: domains[i % domains.length] || `domain${i + 1}.com`,
@@ -302,7 +308,7 @@ const DomainSearchApp = () => {
     ];
     const types = ['Category', 'Topic', 'Brand', 'Product'];
     const frequencies = ['High', 'Medium', 'Low'];
-    
+
     return Array.from({ length: count }, (_, i) => ({
       id: i + 1,
       keyword: keywords[i % keywords.length] || `keyword${i + 1}`,
@@ -366,24 +372,24 @@ const DomainSearchApp = () => {
   ];
 
   const handleDomainSelect = (domain) => {
-    setSelectedDomains(prev => 
-      prev.includes(domain) 
+    setSelectedDomains(prev =>
+      prev.includes(domain)
         ? prev.filter(d => d !== domain)
         : [...prev, domain]
     );
   };
 
   const handleKeywordSelect = (keyword) => {
-    setSelectedKeywords(prev => 
-      prev.includes(keyword) 
+    setSelectedKeywords(prev =>
+      prev.includes(keyword)
         ? prev.filter(k => k !== keyword)
         : [...prev, keyword]
     );
   };
 
   const handleResultSelect = (id) => {
-    setSelectedResults(prev => 
-      prev.includes(id) 
+    setSelectedResults(prev =>
+      prev.includes(id)
         ? prev.filter(r => r !== id)
         : [...prev, id]
     );
@@ -396,7 +402,7 @@ const DomainSearchApp = () => {
   const toggleArrayFilter = (key, value) => {
     setFilters(prev => ({
       ...prev,
-      [key]: prev[key].includes(value) 
+      [key]: prev[key].includes(value)
         ? prev[key].filter(item => item !== value)
         : [...prev[key], value]
     }));
@@ -443,10 +449,10 @@ const DomainSearchApp = () => {
     const totalPages = getTotalPages();
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
+
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -457,17 +463,17 @@ const DomainSearchApp = () => {
 
     return (
       <div className="pagination">
-        <button 
+        <button
           className="pagination-btn"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
           <ChevronLeftIcon />
         </button>
-        
+
         {startPage > 1 && (
           <>
-            <button 
+            <button
               className="pagination-btn"
               onClick={() => handlePageChange(1)}
             >
@@ -476,7 +482,7 @@ const DomainSearchApp = () => {
             {startPage > 2 && <span className="pagination-ellipsis">...</span>}
           </>
         )}
-        
+
         {pages.map(page => (
           <button
             key={page}
@@ -486,11 +492,11 @@ const DomainSearchApp = () => {
             {page}
           </button>
         ))}
-        
+
         {endPage < totalPages && (
           <>
             {endPage < totalPages - 1 && <span className="pagination-ellipsis">...</span>}
-            <button 
+            <button
               className="pagination-btn"
               onClick={() => handlePageChange(totalPages)}
             >
@@ -498,8 +504,8 @@ const DomainSearchApp = () => {
             </button>
           </>
         )}
-        
-        <button 
+
+        <button
           className="pagination-btn"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
@@ -530,7 +536,7 @@ const DomainSearchApp = () => {
                 <button className="clear-all-btn" onClick={clearAllFilters}>
                   Clear All
                 </button>
-                <button 
+                <button
                   onClick={() => setShowFilters(false)}
                   className="close-btn"
                 >
@@ -595,6 +601,60 @@ const DomainSearchApp = () => {
               ))}
             </div>
 
+            {/* Distribution Channel */}
+            <div className="filter-section">
+              <h3 className="filter-title">Distribution Channel</h3>
+              {['Programmatic', 'Direct', 'Private Marketplace', 'Programmatic Guaranteed'].map(channel => (
+                <label key={channel} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={filters.distributionChannel.includes(channel)}
+                    onChange={() => toggleArrayFilter('distributionChannel', channel)}
+                  />
+                  <span className="checkbox-text">{channel}</span>
+                </label>
+              ))}
+            </div>
+
+            {/* Video Placement */}
+            <div className="filter-section">
+              <h3 className="filter-title">Video Placement</h3>
+              {['instream', 'outstream', 'rewarded', 'interstitial'].map(placement => (
+                <label key={placement} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={filters.videoPlacement.includes(placement)}
+                    onChange={() => toggleArrayFilter('videoPlacement', placement)}
+                  />
+                  <span className="checkbox-text">{placement}</span>
+                </label>
+              ))}
+            </div>
+
+            {/* Date Range */}
+            <div className="filter-section">
+              <h3 className="filter-title">Date Range</h3>
+              <select
+                value={filters.dateRange}
+                onChange={(e) => updateFilter('dateRange', parseInt(e.target.value))}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '1px solid var(--openx-border)',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  backgroundColor: 'var(--openx-surface)',
+                  color: 'var(--openx-text-primary)'
+                }}
+              >
+                <option value={7}>Last 7 days</option>
+                <option value={14}>Last 14 days</option>
+                <option value={30}>Last 30 days</option>
+                <option value={60}>Last 60 days</option>
+                <option value={90}>Last 90 days</option>
+              </select>
+            </div>
+
             {/* Geography & Language */}
             <div className="filter-section">
               <h3 className="filter-title">Geography & Language</h3>
@@ -618,8 +678,8 @@ const DomainSearchApp = () => {
               <h3 className="filter-title">Content Style</h3>
               <div className="content-style-tags">
                 {['Factual', 'Editorial', 'Promotional', 'Educational', 'Entertainment', 'User-Generated', 'Reference'].map(style => (
-                  <span 
-                    key={style} 
+                  <span
+                    key={style}
                     className={`tag tag-clickable ${filters.contentStyle.includes(style) ? 'tag-selected' : 'tag-gray'}`}
                     onClick={() => toggleArrayFilter('contentStyle', style)}
                   >
@@ -627,6 +687,33 @@ const DomainSearchApp = () => {
                   </span>
                 ))}
               </div>
+            </div>
+
+            {/* Safety Tier */}
+            <div className="filter-section">
+              <h3 className="filter-title">Safety Tier</h3>
+              {['Universal', 'Standard', 'Limited', 'Restricted'].map(tier => (
+                <label key={tier} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={filters.safetyTier.includes(tier)}
+                    onChange={() => toggleArrayFilter('safetyTier', tier)}
+                  />
+                  <span className="checkbox-text">{tier}</span>
+                </label>
+              ))}
+            </div>
+
+            {/* Direct Publishers Checkbox */}
+            <div className="filter-section">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={filters.isDirect}
+                  onChange={(e) => updateFilter('isDirect', e.target.checked)}
+                />
+                <span className="checkbox-text" style={{ fontWeight: 500 }}>Direct Publishers Only</span>
+              </label>
             </div>
 
             {/* Publishers */}
@@ -647,7 +734,7 @@ const DomainSearchApp = () => {
             {/* Performance & Reach */}
             <div className="filter-section">
               <h3 className="filter-title">Performance & Reach</h3>
-              
+
               <div className="slider-group">
                 <div className="slider-container">
                   <label className="slider-label">Min. Viewability: {filters.minViewability}%</label>
@@ -660,7 +747,7 @@ const DomainSearchApp = () => {
                     className="slider slider-blue"
                   />
                 </div>
-                
+
                 <div className="slider-container">
                   <label className="slider-label">Min. CTR/VTR: {filters.minCTR}%</label>
                   <input
@@ -673,7 +760,7 @@ const DomainSearchApp = () => {
                     className="slider slider-blue"
                   />
                 </div>
-                
+
                 <div className="slider-container">
                   <label className="slider-label">Min. Expected Reach: {filters.minReach}M</label>
                   <input
@@ -705,7 +792,7 @@ const DomainSearchApp = () => {
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                   className="search-input"
                 />
-                
+
                 {/* Search Suggestions Dropdown */}
                 {showSuggestions && searchSuggestions.length > 0 && (
                   <div className="search-suggestions">
@@ -722,7 +809,7 @@ const DomainSearchApp = () => {
                   </div>
                 )}
               </div>
-              <button 
+              <button
                 className="search-button"
                 onClick={handleSearch}
                 disabled={isSearching}
@@ -770,7 +857,7 @@ const DomainSearchApp = () => {
                   <XIcon />
                 </button>
               </div>
-              
+
               {/* Detected Keywords */}
               {searchContext.detectedKeywords.length > 0 && (
                 <div className="context-section">
@@ -784,7 +871,7 @@ const DomainSearchApp = () => {
                   </div>
                 </div>
               )}
-              
+
               {/* Include/Exclude Terms */}
               {(includedTerms.length > 0 || excludedTerms.length > 0) && (
                 <div className="context-section">
@@ -814,7 +901,7 @@ const DomainSearchApp = () => {
                   )}
                 </div>
               )}
-              
+
               {/* Refinement Options */}
               <div className="context-section">
                 <h4 className="context-section-title">Refine Your Search:</h4>
@@ -831,7 +918,7 @@ const DomainSearchApp = () => {
                   ))}
                 </div>
               </div>
-              
+
               {/* Suggested Domains */}
               {searchContext.suggestedDomains.length > 0 && (
                 <div className="context-section">
@@ -890,18 +977,17 @@ const DomainSearchApp = () => {
                     <div className={`campaign-status status-${campaign.status}`}>
                       {campaign.status}
                     </div>
-                    <div className={`match-percentage ${
-                      campaign.match >= 90 ? 'match-high' : 
+                    <div className={`match-percentage ${campaign.match >= 90 ? 'match-high' :
                       campaign.match >= 80 ? 'match-medium' : 'match-low'
-                    }`}>
+                      }`}>
                       {campaign.match}% Match
                     </div>
                   </div>
                 </div>
-                
+
                 <h3 className="campaign-title">{campaign.title}</h3>
                 <p className="campaign-company">{campaign.company}</p>
-                
+
                 <div className="campaign-tags">
                   {campaign.tags.map((tag, index) => (
                     <span key={index} className={`campaign-tag tag-${tag.toLowerCase().replace(/\s+/g, '-')}`}>
@@ -909,7 +995,7 @@ const DomainSearchApp = () => {
                     </span>
                   ))}
                 </div>
-                
+
                 <div className="budget-section">
                   <div className="budget-title">Budget Utilization</div>
                   <div className="budget-amounts">
@@ -917,17 +1003,16 @@ const DomainSearchApp = () => {
                     <span>of ${campaign.budget.total.toLocaleString()}</span>
                   </div>
                   <div className="budget-bar">
-                    <div 
-                      className={`budget-progress ${
-                        campaign.budget.status === 'On track' ? 'budget-on-track' :
+                    <div
+                      className={`budget-progress ${campaign.budget.status === 'On track' ? 'budget-on-track' :
                         campaign.budget.status === 'Pacing ahead' ? 'budget-ahead' : 'budget-behind'
-                      }`}
+                        }`}
                       style={{ width: `${(campaign.budget.used / campaign.budget.total) * 100}%` }}
                     ></div>
                   </div>
                   <div className="budget-status">{campaign.budget.status}</div>
                 </div>
-                
+
                 <div className="campaign-metrics">
                   <div className="metric-group">
                     <div className="metric-label">CTR</div>
@@ -956,7 +1041,7 @@ const DomainSearchApp = () => {
                     <div className="metric-value">{campaign.metrics.cpm.value}</div>
                   </div>
                 </div>
-                
+
                 <div className="campaign-actions">
                   <button className="action-btn">
                     👁️ Details
@@ -965,7 +1050,7 @@ const DomainSearchApp = () => {
                     🎯 Targeting
                   </button>
                 </div>
-                
+
                 <div className="days-remaining">
                   {campaign.daysRemaining} days remaining
                 </div>
@@ -976,13 +1061,13 @@ const DomainSearchApp = () => {
           {/* Tabs */}
           <div className="tabs-container">
             <button
-              onClick={() => {setActiveTab('domains'); setCurrentPage(1);}}
+              onClick={() => { setActiveTab('domains'); setCurrentPage(1); }}
               className={`tab ${activeTab === 'domains' ? 'tab-active' : 'tab-inactive'}`}
             >
               Domains
             </button>
             <button
-              onClick={() => {setActiveTab('keywords'); setCurrentPage(1);}}
+              onClick={() => { setActiveTab('keywords'); setCurrentPage(1); }}
               className={`tab ${activeTab === 'keywords' ? 'tab-active' : 'tab-inactive'}`}
             >
               Keywords
@@ -996,7 +1081,7 @@ const DomainSearchApp = () => {
               <h2 className="section-title">
                 {activeTab === 'domains' ? 'Domain Results' : 'Keyword Results'}
               </h2>
-              
+
               {activeTab === 'domains' ? (
                 <div className="results-list">
                   {getCurrentPageData().map((domain) => (
@@ -1020,7 +1105,7 @@ const DomainSearchApp = () => {
                       </div>
                     </div>
                   ))}
-                  
+
                   <Pagination />
                 </div>
               ) : (
@@ -1046,7 +1131,7 @@ const DomainSearchApp = () => {
                       </div>
                     </div>
                   ))}
-                  
+
                   <Pagination />
                 </div>
               )}
@@ -1070,7 +1155,7 @@ const DomainSearchApp = () => {
             {/* Export Actions Section */}
             <div className="suggestions-section">
               <h2 className="section-title">Export & Actions</h2>
-              
+
               <div className="export-actions">
                 <button className="btn btn-secondary btn-medium">
                   <DownloadIcon />
