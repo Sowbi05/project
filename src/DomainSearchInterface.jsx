@@ -499,8 +499,9 @@ const DomainSearchApp = () => {
     }));
   };
 
-  const domainResults = generateDomainResults(150);
-  const keywordResults = generateKeywordResults(120);
+const [domainResults, setDomainResults] = useState(generateDomainResults(150));
+const [keywordResults, setKeywordResults] = useState(generateKeywordResults(120));
+
 
   // Sample campaign data
   const campaignData = [
@@ -913,12 +914,6 @@ const DomainSearchApp = () => {
                   className="close-btn"
                 >
                   <XIcon />
-                </button>
-                <button
-                  className="btn btn-primary-outline btn-medium"
-                  onClick={() => setShowUploadModal(true)}
-                >
-                  📁 Upload Domains
                 </button>
               </div>
             </div>
@@ -1463,7 +1458,7 @@ const DomainSearchApp = () => {
               </div>
             </div>
           )}
-          <div className="set-tab-container">
+          {/* <div className="set-tab-container">
             <div className="set-tab-info">
               <div className="set-tab-icon">i</div>
               <div>
@@ -1472,7 +1467,7 @@ const DomainSearchApp = () => {
               </div>
             </div>
             <button className="clear-selection-btn">Clear Selection</button>
-          </div>
+          </div> */}
 
           {selectedDomainSet && (
             <div style={{
@@ -1516,7 +1511,7 @@ const DomainSearchApp = () => {
             </div>
           )}
 
-          {/* Campaign Cards Grid */}
+          {/* Campaign Cards Grid
           <div className="campaign-cards-grid">
             {campaignData.map((campaign) => (
               <div key={campaign.id} className="campaign-card">
@@ -1605,7 +1600,7 @@ const DomainSearchApp = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
 
           <div className="sort-controls" style={{
             display: 'flex',
@@ -1830,13 +1825,19 @@ const DomainSearchApp = () => {
               <div className="action-buttons">
                 {activeTab === 'domains' ? (
                   <>
-                    <button className="btn btn-success-outline btn-medium">Exclude Selected</button>
-                    <button className="btn btn-success-outline btn-medium">Add More Domains</button>
+                    <button type="button" className="btn btn-success-outline btn-medium">Exclude Selected</button>
+                    {/* <button type="button" className="btn btn-success-outline btn-medium">Add More Domains</button> */}
+                    <button
+                  className="btn btn-primary-outline btn-medium"
+                  onClick={() => setShowUploadModal(true)}
+                >
+                  📁 Upload Domains
+                </button>
                   </>
                 ) : (
                   <>
-                    <button className="btn btn-primary btn-medium">Add to Search</button>
-                    <button className="btn btn-primary-outline btn-medium">Exclude Selected</button>
+                    <button type="button" className="btn btn-primary btn-medium">Add to Search</button>
+                    <button type="button" className="btn btn-primary-outline btn-medium">Exclude Selected</button>
                   </>
                 )}
               </div>
