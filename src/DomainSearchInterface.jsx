@@ -1777,69 +1777,56 @@ const DomainSearchApp = () => {
             </div>
           )}
 
-          {/* Results Grid */}
-          <div className="results-grid">
+          {/* Results and Actions Section */}
+          <div className="results-container">
             {/* Results Section */}
             <div className={`results-section ${activeTab === 'domains' ? 'section-green' : 'section-purple'}`}>
               <h2 className="section-title">
                 {activeTab === 'domains' ? 'Domain Results' : 'Keyword Results'}
               </h2>
 
-              {activeTab === 'domains' ? (
-                <div className="results-list">
-                  {getCurrentPageData().map((domain) => (
-                    <div key={domain.id} className="result-item">
-                      <div className="result-content">
-                        <div className="result-checkbox">
-                          <input
-                            type="checkbox"
-                            checked={selectedResults.includes(domain.id)}
-                            onChange={() => handleResultSelect(domain.id)}
-                          />
-                        </div>
-                        <div className="result-main">
-                          <h3 className="result-title">{domain.domain}</h3>
-                          <p className="result-subtitle">Categories: {domain.categories.join(', ')}</p>
-                        </div>
-                        <div className="result-metrics">
-                          <div className="metric">Reach: {domain.reach}</div>
-                          <div className="metric">Relevance: {domain.relevance}</div>
-                        </div>
+              <div className="results-list">
+                {getCurrentPageData().map((item) => (
+                  <div key={item.id} className="result-item">
+                    <div className="result-content">
+                      <div className="result-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={selectedResults.includes(item.id)}
+                          onChange={() => handleResultSelect(item.id)}
+                        />
+                      </div>
+                      <div className="result-main">
+                        <h3 className="result-title">
+                          {activeTab === 'domains' ? item.domain : item.keyword}
+                        </h3>
+                        <p className="result-subtitle">
+                          {activeTab === 'domains'
+                            ? `Categories: ${item.categories.join(', ')}`
+                            : `Type: ${item.type} | Frequency: ${item.frequency}`}
+                        </p>
+                      </div>
+                      <div className="result-metrics">
+                        {activeTab === 'domains' ? (
+                          <>
+                            <div className="metric">Reach: {item.reach}</div>
+                            <div className="metric">Relevance: {item.relevance}</div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="metric">{item.urls} URLs</div>
+                            <div className="metric">Relevance: {item.relevance}</div>
+                          </>
+                        )}
                       </div>
                     </div>
-                  ))}
+                  </div>
+                ))}
 
-                  <Pagination />
-                </div>
-              ) : (
-                <div className="results-list">
-                  {getCurrentPageData().map((keyword) => (
-                    <div key={keyword.id} className="result-item">
-                      <div className="result-content">
-                        <div className="result-checkbox">
-                          <input
-                            type="checkbox"
-                            checked={selectedResults.includes(keyword.id)}
-                            onChange={() => handleResultSelect(keyword.id)}
-                          />
-                        </div>
-                        <div className="result-main">
-                          <h3 className="result-title">{keyword.keyword}</h3>
-                          <p className="result-subtitle">Type: {keyword.type} | Frequency: {keyword.frequency}</p>
-                        </div>
-                        <div className="result-metrics">
-                          <div className="metric">{keyword.urls} URLs</div>
-                          <div className="metric">Relevance: {keyword.relevance}</div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                <Pagination />
+              </div>
 
-                  <Pagination />
-                </div>
-              )}
-
-              {/* Action Buttons */}
+              {/* Action Buttons for Domains / Keywords */}
               <div className="action-buttons">
                 {activeTab === 'domains' ? (
                   <>
@@ -1853,27 +1840,27 @@ const DomainSearchApp = () => {
                   </>
                 )}
               </div>
-            </div>
 
-            {/* Export Actions Section */}
-            <div className="suggestions-section">
-              <h2 className="section-title">Export & Actions</h2>
-
-              <div className="export-actions">
-                <button className="btn btn-secondary btn-medium" onClick={exportToCSV} disabled={isExporting}>
-                  <DownloadIcon />
-                  {isExporting ? 'Exporting...' : 'Export Results'}
-                </button>
-                <button
-                  className="btn btn-secondary btn-medium"
-                  onClick={() => setShowSaveModal(true)}
-                  disabled={!searchQuery.trim()}>
-                  <PlusIcon />
-                  Save Search
-                </button>
+              {/* Export & Actions Section BELOW results */}
+              <div className="export-actions-below">
+                <h2 className="section-title">Export & Actions</h2>
+                <div className="export-actions">
+                  <button className="btn btn-secondary btn-medium" onClick={exportToCSV} disabled={isExporting}>
+                    <DownloadIcon />
+                    {isExporting ? 'Exporting...' : 'Export Results'}
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-medium"
+                    onClick={() => setShowSaveModal(true)}
+                    disabled={!searchQuery.trim()}>
+                    <PlusIcon />
+                    Save Search
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
 

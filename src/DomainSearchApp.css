@@ -57,6 +57,7 @@ body {
   width: 100%;
   display: flex;
   align-items: center;
+  border-radius: 0 
 }
 
 .header-content {
@@ -106,7 +107,7 @@ body {
 .header-subtitle {
   font-size: 14px;
   font-weight: 300;
-  color: rgba(255, 255, 255, 0.95);
+  color: rgba(230, 230, 230, 1);
   font-weight: 300;
   position: relative;
   z-index: 3;
@@ -123,7 +124,7 @@ body {
 
 /* Filters Sidebar */
 .filters-sidebar {
-  width: 280px;
+  width: 320px;
   background-color: var(--openx-surface);
   border-right: 1px solid var(--openx-border);
   padding: 24px 20px;
@@ -910,10 +911,16 @@ body {
   color: var(--openx-text-primary);
 }
 
-/* Results Grid */
+/* Results Grid 
 .results-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 24px;
+} */
+
+.results-container {
+  display: flex;
+  flex-direction: column;
   gap: 24px;
 }
 
@@ -924,6 +931,14 @@ body {
   border: 1px solid var(--openx-border);
   padding: 24px;
   box-shadow: var(--openx-shadow-md);
+}
+
+.result-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .section-green {
@@ -1002,7 +1017,20 @@ body {
 
 .result-metrics {
   text-align: right;
+  min-width: 180px;
   font-size: 14px;
+}
+
+.result-main {
+  flex: 1;
+  min-width: 200px;
+}
+
+.action-buttons {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .metric {
@@ -1355,11 +1383,12 @@ body {
 }
 
 /* Export Actions Section */
-.suggestions-section {
-  background-color: var(--openx-surface);
-  border-radius: 12px;
-  border: 1px solid var(--openx-border);
+.export-actions-below {
+  margin-top: 16px;
   padding: 24px;
+  background-color: var(--openx-surface);
+  border: 1px solid var(--openx-border);
+  border-radius: 12px;
   box-shadow: var(--openx-shadow-md);
 }
 
@@ -1390,7 +1419,7 @@ body {
 @media (max-width: 1200px) {
   .results-grid {
     grid-template-columns: 1fr;
-  }
+  } 
   
   .campaign-cards-grid {
     grid-template-columns: repeat(2, 1fr);
