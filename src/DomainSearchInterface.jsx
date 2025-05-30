@@ -75,7 +75,9 @@ const DomainSearchApp = () => {
   const [savedSearches, setSavedSearches] = useState([]);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [searchName, setSearchName] = useState('');
+  const [totalItems, setTotalItems] = useState(0);
   const itemsPerPage = 10;
+ 
 
   // Contextual search intelligence
   const searchContexts = {
@@ -499,8 +501,8 @@ const DomainSearchApp = () => {
     }));
   };
 
-const [domainResults, setDomainResults] = useState(generateDomainResults(150));
-const [keywordResults, setKeywordResults] = useState(generateKeywordResults(120));
+  const [domainResults, setDomainResults] = useState(generateDomainResults(150));
+  const [keywordResults, setKeywordResults] = useState(generateKeywordResults(120));
 
 
   // Sample campaign data
@@ -836,56 +838,32 @@ const [keywordResults, setKeywordResults] = useState(generateKeywordResults(120)
 
     return (
       <div className="pagination">
-        <button
-          className="pagination-btn"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeftIcon />
-        </button>
+        <span className="pagination-range-text">
+          {`${(currentPage - 1) * itemsPerPage + 1} - ${Math.min(currentPage * itemsPerPage, totalItems)
+            } of more than ${totalItems}`}
+        </span>
 
-        {startPage > 1 && (
-          <>
-            <button
-              className="pagination-btn"
-              onClick={() => handlePageChange(1)}
-            >
-              1
-            </button>
-            {startPage > 2 && <span className="pagination-ellipsis">...</span>}
-          </>
-        )}
-
-        {pages.map(page => (
+        <div className="pagination-controls">
           <button
-            key={page}
-            className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
-            onClick={() => handlePageChange(page)}
+            className="pagination-btn"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
           >
-            {page}
+            <ChevronLeftIcon />
           </button>
-        ))}
 
-        {endPage < totalPages && (
-          <>
-            {endPage < totalPages - 1 && <span className="pagination-ellipsis">...</span>}
-            <button
-              className="pagination-btn"
-              onClick={() => handlePageChange(totalPages)}
-            >
-              {totalPages}
-            </button>
-          </>
-        )}
+          <span className="pagination-current-page">{currentPage}</span>
 
-        <button
-          className="pagination-btn"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          <ChevronRightIcon />
-        </button>
+          <button
+            className="pagination-btn"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRightIcon />
+          </button>
+        </div>
       </div>
+
     );
   };
 
@@ -895,7 +873,7 @@ const [keywordResults, setKeywordResults] = useState(generateKeywordResults(120)
       <div className="header">
         <div className="header-content">
           <h1 className="header-title">Discover Inventory</h1>
-          <p className="header-subtitle">Find and select relevant inventory using natural language search</p>
+          <h3 className="header-subtitle">Find and select relevant inventory using natural language search</h3>
         </div>
       </div>
 
@@ -1828,11 +1806,11 @@ const [keywordResults, setKeywordResults] = useState(generateKeywordResults(120)
                     <button type="button" className="btn btn-success-outline btn-medium">Exclude Selected</button>
                     {/* <button type="button" className="btn btn-success-outline btn-medium">Add More Domains</button> */}
                     <button
-                  className="btn btn-primary-outline btn-medium"
-                  onClick={() => setShowUploadModal(true)}
-                >
-                  📁 Upload Domains
-                </button>
+                      className="btn btn-primary-outline btn-medium"
+                      onClick={() => setShowUploadModal(true)}
+                    >
+                      📁 Upload Domains
+                    </button>
                   </>
                 ) : (
                   <>
