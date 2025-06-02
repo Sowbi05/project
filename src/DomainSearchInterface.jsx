@@ -44,6 +44,18 @@ const ChevronRightIcon = () => (
   </svg>
 );
 
+const ChevronUpIcon = () => (
+  <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+  </svg>
+);
+
+const ChevronDownIcon = () => (
+  <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+  </svg>
+);
+
 const DomainSearchApp = () => {
   const [activeTab, setActiveTab] = useState('domains');
   const [searchQuery, setSearchQuery] = useState('premium news sites with high viewability for finance audiences');
@@ -76,8 +88,42 @@ const DomainSearchApp = () => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [searchName, setSearchName] = useState('');
   const [totalItems, setTotalItems] = useState(0);
+  const [expandedSections, setExpandedSections] = useState({
+    includeExclude: true,
+    mediaSubtype: false,
+    deviceType: false,
+    distributionChannel: false,
+    videoPlacement: false,
+    dateRange: false,
+    geography: false,
+    contentStyle: false,
+    safetyTier: false,
+    directPublishers: false,
+    publishers: false,
+    relevance: false,
+    performance: false
+  });
   const itemsPerPage = 10;
- 
+
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  // Helper component for section headers
+  const SectionHeader = ({ title, isExpanded, onToggle }) => (
+    <button
+      className="section-header"
+      onClick={onToggle}
+    >
+      <div className="section-header-content">
+        <h3 className="section-title">{title}</h3>
+      </div>
+      {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+    </button>
+  );
 
   // Contextual search intelligence
   const searchContexts = {
@@ -896,263 +942,387 @@ const DomainSearchApp = () => {
               </div>
             </div>
 
-            {/* Include/Exclude Toggle */}
-            <div className="filter-section">
-              <div className="radio-group">
-                <label className="radio-label">
-                  <input
-                    type="radio"
-                    name="includeExclude"
-                    value="include"
-                    checked={filters.includeExclude === 'include'}
-                    onChange={(e) => updateFilter('includeExclude', e.target.value)}
-                  />
-                  <span className="radio-text">Include</span>
-                </label>
-                <label className="radio-label">
-                  <input
-                    type="radio"
-                    name="includeExclude"
-                    value="exclude"
-                    checked={filters.includeExclude === 'exclude'}
-                    onChange={(e) => updateFilter('includeExclude', e.target.value)}
-                  />
-                  <span className="radio-text">Exclude</span>
-                </label>
-              </div>
-            </div>
-
-            {/* Media Subtype */}
-            <div className="filter-section">
-              <h3 className="filter-title">Media Subtype</h3>
-              {['Video', 'Native', 'Display', 'Video+Native', 'Display+Video', 'Display+Native', 'Display+Video+Native'].map(type => (
-                <label key={type} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={filters.mediaSubtype.includes(type)}
-                    onChange={() => toggleArrayFilter('mediaSubtype', type)}
-                  />
-                  <span className="checkbox-text">{type}</span>
-                </label>
-              ))}
-            </div>
-
-            {/* Device Type */}
-            <div className="filter-section">
-              <h3 className="filter-title">Device Type</h3>
-              {['desktop', 'phone', 'tablet', 'set-top box', 'connected tv', 'mobile/tablet', 'connected device'].map(device => (
-                <label key={device} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={filters.deviceType.includes(device)}
-                    onChange={() => toggleArrayFilter('deviceType', device)}
-                  />
-                  <span className="checkbox-text">{device}</span>
-                </label>
-              ))}
-            </div>
-
-            {/* Distribution Channel */}
-            <div className="filter-section">
-              <h3 className="filter-title">Distribution Channel</h3>
-              {['Programmatic', 'Direct', 'Private Marketplace', 'Programmatic Guaranteed'].map(channel => (
-                <label key={channel} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={filters.distributionChannel.includes(channel)}
-                    onChange={() => toggleArrayFilter('distributionChannel', channel)}
-                  />
-                  <span className="checkbox-text">{channel}</span>
-                </label>
-              ))}
-            </div>
-
-            {/* Video Placement */}
-            <div className="filter-section">
-              <h3 className="filter-title">Video Placement</h3>
-              {['instream', 'outstream', 'rewarded', 'interstitial'].map(placement => (
-                <label key={placement} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={filters.videoPlacement.includes(placement)}
-                    onChange={() => toggleArrayFilter('videoPlacement', placement)}
-                  />
-                  <span className="checkbox-text">{placement}</span>
-                </label>
-              ))}
-            </div>
-
-            {/* Date Range */}
-            <div className="filter-section">
-              <h3 className="filter-title">Date Range</h3>
-              <select
-                value={filters.dateRange}
-                onChange={(e) => updateFilter('dateRange', parseInt(e.target.value))}
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid var(--openx-border)',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  backgroundColor: 'var(--openx-surface)',
-                  color: 'var(--openx-text-primary)'
-                }}
-              >
-                <option value={7}>Last 7 days</option>
-                <option value={14}>Last 14 days</option>
-                <option value={30}>Last 30 days</option>
-                <option value={60}>Last 60 days</option>
-                <option value={90}>Last 90 days</option>
-              </select>
-            </div>
-
-            {/* Geography & Language */}
-            <div className="filter-section">
-              <h3 className="filter-title">Geography & Language</h3>
-              <div className="geography-section">
-                <div className="geography-tags">
-                  <span className="tag tag-blue">Global</span>
-                  <span className="tag tag-blue">US</span>
-                  <span className="tag tag-blue">Europe</span>
-                  <span className="tag tag-blue">APAC</span>
-                </div>
-                <div className="language-tags">
-                  <span className="tag tag-gray">English</span>
-                  <span className="tag tag-gray">Spanish</span>
-                  <span className="tag tag-gray">French</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Content Style */}
-            <div className="filter-section">
-              <h3 className="filter-title">Content Style</h3>
-              <div className="content-style-tags">
-                {['Factual', 'Editorial', 'Promotional', 'Educational', 'Entertainment', 'User-Generated', 'Reference'].map(style => (
-                  <span
-                    key={style}
-                    className={`tag tag-clickable ${filters.contentStyle.includes(style) ? 'tag-selected' : 'tag-gray'}`}
-                    onClick={() => toggleArrayFilter('contentStyle', style)}
-                  >
-                    {style}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Safety Tier */}
-            <div className="filter-section">
-              <h3 className="filter-title">Safety Tier</h3>
-              {['Universal', 'Standard', 'Limited', 'Restricted'].map(tier => (
-                <label key={tier} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={filters.safetyTier.includes(tier)}
-                    onChange={() => toggleArrayFilter('safetyTier', tier)}
-                  />
-                  <span className="checkbox-text">{tier}</span>
-                </label>
-              ))}
-            </div>
-
-            {/* Direct Publishers Checkbox */}
-            <div className="filter-section">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={filters.isDirect}
-                  onChange={(e) => updateFilter('isDirect', e.target.checked)}
+            <div className="filters-content">
+              {/* Include/Exclude Toggle */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Include/Exclude"
+                  isExpanded={expandedSections.includeExclude}
+                  onToggle={() => toggleSection('includeExclude')}
+                  hasActiveFilters={filters.includeExclude !== 'include'}
                 />
-                <span className="checkbox-text" style={{ fontWeight: 500 }}>Direct Publishers Only</span>
-              </label>
-            </div>
-
-            {/* Publishers */}
-            <div className="filter-section">
-              <h3 className="filter-title">Publishers</h3>
-              {['Financial Times Ltd.', 'Dow Jones & Co.', 'Bloomberg L.P.', 'NBCUniversal'].map(pub => (
-                <label key={pub} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={filters.publishers.includes(pub)}
-                    onChange={() => toggleArrayFilter('publishers', pub)}
-                  />
-                  <span className="checkbox-text">{pub}</span>
-                </label>
-              ))}
-            </div>
-
-            {/*Relevance scoring*/}
-            <div className="filter-section">
-              <h3 className="filter-title">Relevance Scoring</h3>
-
-              <div className="slider-group">
-                <div className="slider-container">
-                  <label className="slider-label">Min. Relevance Score: {filters.relevance}%</label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={filters.relevance}
-                    onChange={(e) => updateFilter('relevance', parseInt(e.target.value))}
-                    className="slider slider-blue"
-                  />
-                </div>
+                {expandedSections.includeExclude && (
+                  <div className="section-content">
+                    <div className="radio-group">
+                      <label className="radio-label">
+                        <input
+                          type="radio"
+                          name="includeExclude"
+                          value="include"
+                          checked={filters.includeExclude === 'include'}
+                          onChange={(e) => updateFilter('includeExclude', e.target.value)}
+                        />
+                        <span className="radio-text">Include</span>
+                      </label>
+                      <label className="radio-label">
+                        <input
+                          type="radio"
+                          name="includeExclude"
+                          value="exclude"
+                          checked={filters.includeExclude === 'exclude'}
+                          onChange={(e) => updateFilter('includeExclude', e.target.value)}
+                        />
+                        <span className="radio-text">Exclude</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div style={{
-                fontSize: '12px',
-                color: 'var(--openx-text-secondary)',
-                marginTop: '8px',
-                backgroundColor: 'var(--openx-background)',
-                padding: '8px',
-                borderRadius: '4px'
-              }}>
-                💡 Relevance combines contextual matching, keyword alignment, and content quality scores
+              {/* Media Subtype */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Media Subtype"
+                  isExpanded={expandedSections.mediaSubtype}
+                  onToggle={() => toggleSection('mediaSubtype')}
+                  hasActiveFilters={filters.mediaSubtype.length > 0}
+                />
+                {expandedSections.mediaSubtype && (
+                  <div className="section-content">
+                    {['Video', 'Native', 'Display', 'Video+Native', 'Display+Video', 'Display+Native', 'Display+Video+Native'].map(type => (
+                      <label key={type} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={filters.mediaSubtype.includes(type)}
+                          onChange={() => toggleArrayFilter('mediaSubtype', type)}
+                        />
+                        <span className="checkbox-text">{type}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
 
-            {/* Performance & Reach */}
-            <div className="filter-section">
-              <h3 className="filter-title">Performance & Reach</h3>
+              {/* Device Type */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Device Type"
+                  isExpanded={expandedSections.deviceType}
+                  onToggle={() => toggleSection('deviceType')}
+                  hasActiveFilters={filters.deviceType.length > 0}
+                />
+                {expandedSections.deviceType && (
+                  <div className="section-content">
+                    {['desktop', 'phone', 'tablet', 'set-top box', 'connected tv', 'mobile/tablet', 'connected device'].map(device => (
+                      <label key={device} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={filters.deviceType.includes(device)}
+                          onChange={() => toggleArrayFilter('deviceType', device)}
+                        />
+                        <span className="checkbox-text">{device}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-              <div className="slider-group">
-                <div className="slider-container">
-                  <label className="slider-label">Min. Viewability: {filters.minViewability}%</label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={filters.minViewability}
-                    onChange={(e) => updateFilter('minViewability', parseInt(e.target.value))}
-                    className="slider slider-blue"
-                  />
-                </div>
+              {/* Distribution Channel */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Distribution Channel"
+                  isExpanded={expandedSections.distributionChannel}
+                  onToggle={() => toggleSection('distributionChannel')}
+                  hasActiveFilters={filters.distributionChannel.length > 0}
+                />
+                {expandedSections.distributionChannel && (
+                  <div className="section-content">
+                    {['Programmatic', 'Direct', 'Private Marketplace', 'Programmatic Guaranteed'].map(channel => (
+                      <label key={channel} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={filters.distributionChannel.includes(channel)}
+                          onChange={() => toggleArrayFilter('distributionChannel', channel)}
+                        />
+                        <span className="checkbox-text">{channel}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-                <div className="slider-container">
-                  <label className="slider-label">Min. CTR/VTR: {filters.minCTR}%</label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="0.1"
-                    value={filters.minCTR}
-                    onChange={(e) => updateFilter('minCTR', parseFloat(e.target.value))}
-                    className="slider slider-blue"
-                  />
-                </div>
+              {/* Video Placement */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Video Placement"
+                  isExpanded={expandedSections.videoPlacement}
+                  onToggle={() => toggleSection('videoPlacement')}
+                  hasActiveFilters={filters.videoPlacement.length > 0}
+                />
+                {expandedSections.videoPlacement && (
+                  <div className="section-content">
+                    {['instream', 'outstream', 'rewarded', 'interstitial'].map(placement => (
+                      <label key={placement} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={filters.videoPlacement.includes(placement)}
+                          onChange={() => toggleArrayFilter('videoPlacement', placement)}
+                        />
+                        <span className="checkbox-text">{placement}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-                <div className="slider-container">
-                  <label className="slider-label">Min. Expected Reach: {filters.minReach}M</label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="100"
-                    value={filters.minReach}
-                    onChange={(e) => updateFilter('minReach', parseInt(e.target.value))}
-                    className="slider slider-blue"
-                  />
-                </div>
+              {/* Date Range */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Date Range"
+                  isExpanded={expandedSections.dateRange}
+                  onToggle={() => toggleSection('dateRange')}
+                  hasActiveFilters={filters.dateRange !== 30}
+                />
+                {expandedSections.dateRange && (
+                  <div className="section-content">
+                    <select
+                      value={filters.dateRange}
+                      onChange={(e) => updateFilter('dateRange', parseInt(e.target.value))}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: '1px solid var(--openx-border)',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        backgroundColor: 'var(--openx-surface)',
+                        color: 'var(--openx-text-primary)'
+                      }}
+                    >
+                      <option value={7}>Last 7 days</option>
+                      <option value={14}>Last 14 days</option>
+                      <option value={30}>Last 30 days</option>
+                      <option value={60}>Last 60 days</option>
+                      <option value={90}>Last 90 days</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Geography & Language */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Geography & Language"
+                  isExpanded={expandedSections.geography}
+                  onToggle={() => toggleSection('geography')}
+                />
+                {expandedSections.geography && (
+                  <div className="section-content">
+                    <div className="geography-section">
+                      <div className="tag-group">
+                        <h4 className="tag-group-title">Regions</h4>
+                        <div className="geography-tags">
+                          <span className="tag tag-blue">Global</span>
+                          <span className="tag tag-blue">US</span>
+                          <span className="tag tag-blue">Europe</span>
+                          <span className="tag tag-blue">APAC</span>
+                        </div>
+                      </div>
+                      <div className="tag-group">
+                        <h4 className="tag-group-title">Languages</h4>
+                        <div className="language-tags">
+                          <span className="tag tag-gray">English</span>
+                          <span className="tag tag-gray">Spanish</span>
+                          <span className="tag tag-gray">French</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Content Style */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Content Style"
+                  isExpanded={expandedSections.contentStyle}
+                  onToggle={() => toggleSection('contentStyle')}
+                  hasActiveFilters={filters.contentStyle.length > 0}
+                />
+                {expandedSections.contentStyle && (
+                  <div className="section-content">
+                    <div className="content-style-tags">
+                      {['Factual', 'Editorial', 'Promotional', 'Educational', 'Entertainment', 'User-Generated', 'Reference'].map(style => (
+                        <span
+                          key={style}
+                          className={`tag tag-clickable ${filters.contentStyle.includes(style) ? 'tag-selected' : 'tag-gray'}`}
+                          onClick={() => toggleArrayFilter('contentStyle', style)}
+                        >
+                          {style}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Safety Tier */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Safety Tier"
+                  isExpanded={expandedSections.safetyTier}
+                  onToggle={() => toggleSection('safetyTier')}
+                  hasActiveFilters={filters.safetyTier.length > 0}
+                />
+                {expandedSections.safetyTier && (
+                  <div className="section-content">
+                    {['Universal', 'Standard', 'Limited', 'Restricted'].map(tier => (
+                      <label key={tier} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={filters.safetyTier.includes(tier)}
+                          onChange={() => toggleArrayFilter('safetyTier', tier)}
+                        />
+                        <span className="checkbox-text">{tier}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Direct Publishers */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Direct Publishers"
+                  isExpanded={expandedSections.directPublishers}
+                  onToggle={() => toggleSection('directPublishers')}
+                  hasActiveFilters={filters.isDirect}
+                />
+                {expandedSections.directPublishers && (
+                  <div className="section-content">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={filters.isDirect}
+                        onChange={(e) => updateFilter('isDirect', e.target.checked)}
+                      />
+                      <span className="checkbox-text" style={{ fontWeight: 500 }}>Direct Publishers Only</span>
+                    </label>
+                  </div>
+                )}
+              </div>
+
+              {/* Publishers */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Publishers"
+                  isExpanded={expandedSections.publishers}
+                  onToggle={() => toggleSection('publishers')}
+                  hasActiveFilters={filters.publishers.length > 0}
+                />
+                {expandedSections.publishers && (
+                  <div className="section-content">
+                    {['Financial Times Ltd.', 'Dow Jones & Co.', 'Bloomberg L.P.', 'NBCUniversal'].map(pub => (
+                      <label key={pub} className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={filters.publishers.includes(pub)}
+                          onChange={() => toggleArrayFilter('publishers', pub)}
+                        />
+                        <span className="checkbox-text">{pub}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Relevance scoring */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Relevance Scoring"
+                  isExpanded={expandedSections.relevance}
+                  onToggle={() => toggleSection('relevance')}
+                  hasActiveFilters={filters.relevance !== 75}
+                />
+                {expandedSections.relevance && (
+                  <div className="section-content">
+                    <div className="slider-group">
+                      <div className="slider-container">
+                        <label className="slider-label">Min. Relevance Score: {filters.relevance}%</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={filters.relevance}
+                          onChange={(e) => updateFilter('relevance', parseInt(e.target.value))}
+                          className="slider slider-blue"
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{
+                      fontSize: '12px',
+                      color: 'var(--openx-text-secondary)',
+                      marginTop: '8px',
+                      backgroundColor: 'var(--openx-background)',
+                      padding: '8px',
+                      borderRadius: '4px'
+                    }}>
+                      💡 Relevance combines contextual matching, keyword alignment, and content quality scores
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Performance & Reach */}
+              <div className="filter-section">
+                <SectionHeader
+                  title="Performance & Reach"
+                  isExpanded={expandedSections.performance}
+                  onToggle={() => toggleSection('performance')}
+                  hasActiveFilters={filters.minViewability !== 80 || filters.minCTR !== 2.0 || filters.minReach !== 10}
+                />
+                {expandedSections.performance && (
+                  <div className="section-content">
+                    <div className="slider-group">
+                      <div className="slider-container">
+                        <label className="slider-label">Min. Viewability: {filters.minViewability}%</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={filters.minViewability}
+                          onChange={(e) => updateFilter('minViewability', parseInt(e.target.value))}
+                          className="slider slider-blue"
+                        />
+                      </div>
+
+                      <div className="slider-container">
+                        <label className="slider-label">Min. CTR/VTR: {filters.minCTR}%</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="10"
+                          step="0.1"
+                          value={filters.minCTR}
+                          onChange={(e) => updateFilter('minCTR', parseFloat(e.target.value))}
+                          className="slider slider-blue"
+                        />
+                      </div>
+
+                      <div className="slider-container">
+                        <label className="slider-label">Min. Expected Reach: {filters.minReach}M</label>
+                        <input
+                          type="range"
+                          min="1"
+                          max="100"
+                          value={filters.minReach}
+                          onChange={(e) => updateFilter('minReach', parseInt(e.target.value))}
+                          className="slider slider-blue"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
